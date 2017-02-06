@@ -20,15 +20,10 @@ public class MusicPlayer : MonoBehaviour {
 		}
 	}
 
-
 	// Use this for initialization
 	void Start ()
 	{
 		Debug.Log("MusicPlayer Start: ID: " + GetInstanceID());
-
-
-		
-
 	}
 	
 	// Update is called once per frame

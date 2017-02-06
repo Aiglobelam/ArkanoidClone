@@ -11,6 +11,10 @@ public class Brick : MonoBehaviour {
 	public Sprite[] hitSprites;
 	private bool isBreakable;
 
+	public AudioClip crackSound;
+
+	public GameObject smoke;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -22,29 +26,32 @@ public class Brick : MonoBehaviour {
 			numBreakableBlocksInGame++;
 			//print("numBreakableBlocksInGame: " + numBreakableBlocksInGame);
 		}
-
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
-	}
+	//void Update () {
+	//
+	//}
 
 	/*
 	void OnTriggerEnter2D (Collider2D collider)
 	{
 		print("Brick.cs OnTriggerEnter2D");
-	
 	}
 	*/
 
 	void OnCollisionEnter2D (Collision2D collision)
 	{
+		// If we somehow failed attaching a cracksound to the brick or if the brick should NOT have a crack sound
+		if (crackSound) {
+			AudioSource.PlayClipAtPoint (crackSound, transform.position, 0.8f);
+		} else {
+			//Debug.Log("Brick does not have cracksound attached");
+		}
 
 		if (isBreakable) {
 			HandleHits();
 		}
-		//SimulateWin();
 	}
 
 	void HandleHits ()
@@ -55,6 +62,7 @@ public class Brick : MonoBehaviour {
 		if (timesHit >= maxHits) {
 			numBreakableBlocksInGame--;
 			//print("numBreakableBlocksInGame: " + numBreakableBlocksInGame);
+			PuffSmoke();
 			Destroy (this.gameObject);
 			lm.BrickDestroyedMessage();
 		} else {
@@ -63,17 +71,20 @@ public class Brick : MonoBehaviour {
 		}
 	}
 
-	//TODO REMOVE THIS METHOD WHEN WE CAN IN
-	void SimulateWin ()
+	void PuffSmoke ()
 	{
-		lm.LoadNextLevel();
+		GameObject smokePuff = Object.Instantiate(smoke, gameObject.transform.position, Quaternion.identity) as GameObject;
+		//smokePuff.particleSystem.startColor = GetComponent<SpriteRenderer>().color;
+		smokePuff.GetComponent<ParticleSystem>().startColor = this.gameObject.GetComponent<SpriteRenderer>().color;
 	}
 
 	void LoadSprites ()
 	{
 		int spriteIndexToLoad = this.timesHit - 1;
 		if (hitSprites [spriteIndexToLoad]) {
-			this.GetComponent<SpriteRenderer>().sprite = hitSprites[spriteIndexToLoad];
+			this.GetComponent<SpriteRenderer> ().sprite = hitSprites [spriteIndexToLoad];
+		} else {
+			Debug.LogError("Brick is missing sprite at index: " + spriteIndexToLoad);
 		}
 	}
 }

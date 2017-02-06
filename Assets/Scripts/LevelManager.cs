@@ -16,6 +16,7 @@ public class LevelManager : MonoBehaviour {
 	public void LoadLevel(string name){
 		//Debug.Log("LoadLevel name: " + name);
 		//Obsolete use SceneManager.LoadScene instead...
+		Brick.numBreakableBlocksInGame = 0;
 		Application.LoadLevel(name);
 	}
 
@@ -30,6 +31,7 @@ public class LevelManager : MonoBehaviour {
 
 	public void LoadNextLevel ()
 	{
+		Brick.numBreakableBlocksInGame = 0;
 		//Load next level in "sequence" set in "Build Setting" => "Scenes In Build"
 		Application.LoadLevel(Application.loadedLevel +1);
 	}
