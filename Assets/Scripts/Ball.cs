@@ -11,6 +11,8 @@ public class Ball : MonoBehaviour {
 	// The vector describes the diffrence in position x,y,z between the center of the paddle and
 	// the center of the ball...
 	private Vector3 paddleToBallVector;
+	private Vector3 previousTransformPostion;
+	private int almostEqualsNumberOfTimes = 0;
 
 	private AudioSource audioSource;
 
@@ -24,16 +26,54 @@ public class Ball : MonoBehaviour {
 		audioSource = GetComponent<AudioSource>();
 	}
 
+	bool isAlmostEqual(float previous, float now){
+		//            |                    |                |       
+		// --*--------|--------*-----------|---*------------|-------*---------> (x)
+		//   |        p-0.1f   |           p   |            p+0.1f  |
+		//   n=false           n=true          n=true               n=false
+		//
+		if (now >= (previous-0.1f) && now <= (previous + 0.1f)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	void OnCollisionEnter2D (Collision2D collision2d)
 	{
 		//Ball does not trigger soun when brick is destroyed
 		//Not 100% sure but it is possibly because the brick isnt there anymore...??
 		if (this.hasStarted) {
 			audioSource.Play();	
-			Vector2 tweek = new Vector2(Random.Range(0f, 0.2f), Random.Range(0f, 0.2f));
+			//Vector2 tweek = new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f));
 			//print(tweek);
-			rb2D.velocity += tweek; 
+			//rb2D.velocity += tweek; 
+
+			if (collision2d.collider.name == "Paddle") {
+				print ("Ball hit the Paddle!!!!");
+				rb2D.AddForce(new Vector2(0f, 0.5f));
+
+			}
+
+			if(isAlmostEqual(previousTransformPostion.x, this.transform.position.x)){
+				print ("Almost equal");
+				almostEqualsNumberOfTimes++;
+			} else {
+				print("Not Equal");
+				almostEqualsNumberOfTimes = 0;
+			}
+
+			if (almostEqualsNumberOfTimes >= 3) {
+				print ("Hmmm we seem stuck in a loop apply random force");
+				rb2D.velocity += new Vector2 (Random.Range (1f, 2f), 0);
+			}
+
+			previousTransformPostion = this.transform.position;
 		}
+
+	
+
+
 	}
 
 	// Update is called once per frame
